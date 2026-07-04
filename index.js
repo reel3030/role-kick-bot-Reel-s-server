@@ -17,6 +17,13 @@ client.once("clientReady", () => {
   console.log(`Bot ready: ${client.user.tag}`);
 });
 
+client.on("guildMemberAdd", async member => {
+
+  console.log(`${member.user.tag} が参加しました`);
+
+});
+
+
 client.login(process.env.TOKEN);
 
 app.get("/", (req, res) => {

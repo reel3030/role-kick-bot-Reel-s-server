@@ -6,6 +6,19 @@ import {
 
 const app = express();
 
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers
+  ]
+});
+
+client.once("clientReady", () => {
+  console.log(`Bot ready: ${client.user.tag}`);
+});
+
+client.login(process.env.TOKEN);
+
 app.get("/", (req, res) => {
   res.send("Bot is running");
 });

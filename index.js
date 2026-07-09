@@ -18,34 +18,7 @@ const client = new Client({
 
 client.once("clientReady", async () => {
 
-  console.log(`Bot ready: ${client.user.tag}`);
-
-  
-// --- ここから追加 ---
-const CHANNEL_ID = process.env.SENDINFO;
-
-if (CHANNEL_ID) {
-    client.channels.fetch(CHANNEL_ID)
-        .then(channel => {
-            if (channel) {
-                // Embedの作成（オレンジ色 / タイトル変更）
-                const embed = {
-                    title: 'サーバー情報 / Server Info',
-                    color: 0xE67E22, // Discord標準のオレンジ色
-                    description: `**サーバー作成日** | <t:1766712360:f>\n**サーバー招待URL** | https://discord.gg/nFaZAqzqGM https://dsc.gg/reel-server`,
-                    
-                };
-
-                channel.send({ embeds: [embed] })
-                    .then(() => console.log('Embedメッセージを送信しました。'))
-                    .catch(console.error);
-            }
-        })
-        .catch(console.error);
-} else {
-    console.error('環境変数 SENDINFO が設定されていません。');
-}
-// --- ここまで追加 ---
+  console.log(`Bot ready: ${client.user.tag}`
 
 
 

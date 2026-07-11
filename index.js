@@ -4,7 +4,11 @@ dotenv.config();
 import express from "express";
 import {
   Client,
-  GatewayIntentBits
+  GatewayIntentBits,
+  EmbedBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder
 } from "discord.js";
 
 const app = express();
@@ -112,22 +116,27 @@ client.on("messageCreate", async message => {
   if (message.content !== "rsbot!verify") return;
   if (!message.member.roles.cache.has(process.env.VERIFY_MANAGER_ROLE_ID)) {
     return;
-    const embed = new EmbedBuilder()
-      .setTitle("認証")
-      .setDescription(
-        "認証をすると、<@&1467451539722342552>が付与され、サーバーで喋れるようになります。"
-      )
-      .setColor("Green");
-    const button = new ButtonBuilder()
-      .setCustomId("verify")
-      .setLabel("認証する")
-      .setStyle(ButtonStyle.Success);
-    const row = new ActionRowBuilder().addComponents(button);
-    await message.channel.send({
-      embeds: [embed],
-      components: [row]
-    });
   }
+
+  const embed = new EmbedBuilder()
+    .setTitle("認証")
+    .setDescription(
+      "認証をすると、<@&1467451539722342552>が付与され、サーバーで喋れるようになります。"
+    )
+    .setColor("Green");
+
+  const button = new ButtonBuilder()
+    .setCustomId("verify")
+    .setLabel("認証する")
+    .setStyle(ButtonStyle.Success);
+
+  const row = new ActionRowBuilder().addComponents(button);
+
+  await message.channel.send({
+    embeds: [embed],
+    components: [row]
+  });
+}
 });
 
 

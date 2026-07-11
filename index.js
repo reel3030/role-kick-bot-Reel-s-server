@@ -2,13 +2,16 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import { Captcha } from "captcha-canvas";
+import crypto from "crypto";
 import {
   Client,
   GatewayIntentBits,
   EmbedBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ActionRowBuilder
+  ActionRowBuilder,
+  AttachmentBuilder
 } from "discord.js";
 
 const app = express();

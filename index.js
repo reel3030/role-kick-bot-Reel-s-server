@@ -13,7 +13,7 @@ import {
   ActionRowBuilder,
   AttachmentBuilder,
 } from "discord.js";
-
+const captchas = new Map();
 const app = express();
 
 const client = new Client({

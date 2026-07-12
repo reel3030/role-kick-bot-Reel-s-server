@@ -13,8 +13,8 @@ import {
   ActionRowBuilder,
   AttachmentBuilder,
   ModalBuilder,
-TextInputBuilder,
-TextInputStyle,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 const captchas = new Map();
 const app = express();
@@ -139,10 +139,7 @@ client.on("interactionCreate", async (interaction) => {
     ephemeral: true,
   });
 
-  const answer = crypto.randomBytes(3)
-    .toString("hex")
-    .toUpperCase();
-
+  const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
 
   const captcha = new Captcha({
     text: answer,
@@ -155,34 +152,26 @@ client.on("interactionCreate", async (interaction) => {
   captcha.addDecoy();
   captcha.drawTrace();
 
-
   const buffer = await captcha.png;
-
 
   const attachment = new AttachmentBuilder(buffer, {
     name: "captcha.png",
   });
-
 
   const answerButton = new ButtonBuilder()
     .setCustomId("captcha_answer")
     .setLabel("回答する")
     .setStyle(ButtonStyle.Primary);
 
-
-  const answerRow = new ActionRowBuilder()
-    .addComponents(answerButton);
-
+  const answerRow = new ActionRowBuilder().addComponents(answerButton);
 
   captchas.set(interaction.user.id, answer);
-
 
   await interaction.editReply({
     content: "画像に表示されている文字を入力してください。",
     files: [attachment],
     components: [answerRow],
   });
-
 });
 
 client.login(process.env.TOKEN);

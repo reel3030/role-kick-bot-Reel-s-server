@@ -11,7 +11,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
-  AttachmentBuilder
+  AttachmentBuilder,
 } from "discord.js";
 
 const app = express();
@@ -22,15 +22,11 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-  ]
+  ],
 });
 
 client.once("clientReady", async () => {
-
   console.log(`Bot ready: ${client.user.tag}`);
-
-
-
 
   const guild = await client.guilds.fetch(process.env.GUILD_ID);
   await guild.members.fetch();
@@ -38,9 +34,7 @@ client.once("clientReady", async () => {
   const threeDays = 1000 * 60 * 60 * 24 * 3;
 
   for (const member of guild.members.cache.values()) {
-
     try {
-
       if (member.user.bot) continue;
 
       if (!member.joinedAt) continue;
@@ -55,36 +49,30 @@ client.once("clientReady", async () => {
 
       try {
         await member.send(
-          "3日以内に認証ロールが付与されなかったため、サーバーから退出となりました。\n dsc.gg/reel-server こちらから再参加が可能です。"
+          "3日以内に認証ロールが付与されなかったため、サーバーから退出となりました。\n dsc.gg/reel-server こちらから再参加が可能です。",
         );
       } catch {
         console.log(`${member.user.tag} にDMを送信できませんでした。`);
       }
 
       await member.kick(
-        "3日以内に認証ロールが付与されなかったため botによりkickされました。"
+        "3日以内に認証ロールが付与されなかったため botによりkickされました。",
       );
 
       console.log(`${member.user.tag} をKickしました。`);
-
     } catch (err) {
       console.error(`${member.user.tag} の処理中にエラー:`, err);
     }
-
   }
-
 });
 
-client.on("guildMemberAdd", async member => {
-
+client.on("guildMemberAdd", async (member) => {
   console.log(`${member.user.tag} が参加しました`);
 
   const threeDays = 1000 * 60 * 60 * 24 * 3;
 
   setTimeout(async () => {
-
     try {
-
       const freshMember = await member.guild.members.fetch(member.id);
 
       if (freshMember.roles.cache.has(process.env.TARGET_ROLE_ID)) {
@@ -93,27 +81,22 @@ client.on("guildMemberAdd", async member => {
 
       try {
         await freshMember.send(
-          "3日以内に認証ロールが付与されなかったため、サーバーから退出となりました。"
+          "3日以内に認証ロールが付与されなかったため、サーバーから退出となりました。",
         );
       } catch {
         console.log(`${freshMember.user.tag} にDMを送信できませんでした。`);
       }
 
-      await freshMember.kick(
-        "3日以内に認証ロールが付与されなかったため"
-      );
+      await freshMember.kick("3日以内に認証ロールが付与されなかったため");
 
       console.log(`${freshMember.user.tag} をKickしました。`);
-
     } catch (err) {
       console.error(`${member.user.tag} の確認中にエラー:`, err);
     }
-
   }, threeDays);
-
 });
 
-client.on("messageCreate", async message => {
+client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   if (message.content !== "rsbot!verify") return;
@@ -124,7 +107,7 @@ client.on("messageCreate", async message => {
   const embed = new EmbedBuilder()
     .setTitle("認証")
     .setDescription(
-      "認証をすると、<@&1467451539722342552>が付与され、サーバーで喋れるようになります。"
+      "認証をすると、<@&1467451539722342552>が付与され、サーバーで喋れるようになります。",
     )
     .setColor("Green");
 
@@ -137,11 +120,41 @@ client.on("messageCreate", async message => {
 
   await message.channel.send({
     embeds: [embed],
-    components: [row]
+    components: [row],
   });
-}
-);
+});
 
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  if (interaction.customId !== "verify") return;
+  const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
+  const captcha = new Captcha();
+  captcha.width = 300;
+  captcha.height = 100;
+  captcha.text = answer;
+  captcha.async = true;
+  captcha.addDecoy();
+  captcha.drawTrace();
+  const buffer = await captcha.png;
+  const attachment = new AttachmentBuilder(buffer, {
+    name: "captcha.png",
+  });
+});
+
+const answerButton = new ButtonBuilder()
+  .setCustomId("captcha_answer")
+  .setLabel("回答する")
+  .setStyle(ButtonStyle.Primary);
+
+const answerRow = new ActionRowBuilder().addComponents(answerButton);
+captchas.set(interaction.user.id, answer);
+await interaction.reply({
+  content: "画像に表示されている文字を入力してください。",
+  files: [attachment],
+  components: [answerRow],
+  ephemeral: true,
+});
 
 client.login(process.env.TOKEN);
 

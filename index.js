@@ -154,8 +154,12 @@ client.on("interactionCreate", async (interaction) => {
       });
       return;
     }
+    const member = await interaction.guild.members.fetch(interaction.user.id);
+
+    await member.roles.add(process.env.TARGET_ROLE_ID);
 
     await interaction.reply({
+
       content: "認証成功しました！",
       ephemeral: true,
     });

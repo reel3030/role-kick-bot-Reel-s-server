@@ -141,19 +141,17 @@ client.on("interactionCreate", async (interaction) => {
 
   const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
 
-  const captcha = new Captcha({
-    text: answer,
-  });
+  const captcha = new Captcha();
 
   captcha.async = true;
   captcha.width = 300;
   captcha.height = 100;
+  captcha.text = answer;
 
-  captcha.addDecoy();
+  captcha.addDecoy(5);
   captcha.drawTrace();
 
   const buffer = await captcha.png;
-
   const attachment = new AttachmentBuilder(buffer, {
     name: "captcha.png",
   });

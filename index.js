@@ -137,15 +137,16 @@ client.on("interactionCreate", async (interaction) => {
 
     const answer = interaction.fields.getTextInputValue("captcha_input");
 
-    const correctAnswer = captchas.get(interaction.user.id);
+    const captchaData = captchas.get(interaction.user.id);
 
-    if (!correctAnswer) {
+    if (!captchaData) {
       await interaction.reply({
         content: "認証情報がありません。もう一度やり直してください。",
         ephemeral: true,
       });
       return;
     }
+    const correctAnswer = captchaData.answer;
 
     if (answer.toUpperCase() !== correctAnswer) {
       await interaction.reply({
@@ -157,6 +158,8 @@ client.on("interactionCreate", async (interaction) => {
     const member = await interaction.guild.members.fetch(interaction.user.id);
 
     await member.roles.add(process.env.TARGET_ROLE_ID);
+
+    await captchaData.interaction.deleteReply().catch(() => { });
 
     await interaction.reply({
 
@@ -234,7 +237,10 @@ client.on("interactionCreate", async (interaction) => {
 
     const answerRow = new ActionRowBuilder().addComponents(answerButton);
 
-    captchas.set(interaction.user.id, answer);
+    captchas.set(interaction.user.id, {
+      answer,
+      interaction,
+    });
 
     await interaction.editReply({
       content: "画像に表示されている文字を入力してください。",

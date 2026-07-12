@@ -141,17 +141,23 @@ client.on("interactionCreate", async (interaction) => {
 
   const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
 
-  const captcha = new Captcha({
+  const captcha = new Captcha(300, 100, answer.length);
+
+  captcha.async = true;
+
+  captcha.drawCaptcha({
     text: answer,
   });
-  captcha.async = true;
-  captcha.width = 300;
-  captcha.height = 100;
 
-//  captcha.addDecoy(5);
   captcha.drawTrace();
 
+  // 一旦 addDecoy は外したまま
+  // captcha.addDecoy({ total: 20 });
+
   const buffer = await captcha.png;
+
+  const buffer = await captcha.png;
+  console.log(buffer.length);
   const attachment = new AttachmentBuilder(buffer, {
     name: "captcha.png",
   });

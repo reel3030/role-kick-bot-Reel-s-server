@@ -148,7 +148,7 @@ client.on("interactionCreate", async (interaction) => {
   captcha.width = 300;
   captcha.height = 100;
 
-  captcha.addDecoy(5);
+//  captcha.addDecoy(5);
   captcha.drawTrace();
 
   const buffer = await captcha.png;

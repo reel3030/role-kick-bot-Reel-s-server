@@ -187,6 +187,8 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
+    if (interaction.customId !== "verify") return;
+
     await interaction.deferReply({
       ephemeral: true,
     });
@@ -227,6 +229,7 @@ client.on("interactionCreate", async (interaction) => {
       components: [answerRow],
     });
   });
+});
 
 client.login(process.env.TOKEN);
 

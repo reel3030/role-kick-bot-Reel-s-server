@@ -131,50 +131,68 @@ client.on("messageCreate", async (message) => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
+  if (interaction.isButton()) {
 
-  if (interaction.customId !== "verify") return;
+    if (interaction.customId === "captcha_answer") {
+      const modal = new ModalBuilder()
+        .setCustomId("captcha_modal")
+        .setTitle("認証");
 
-  await interaction.deferReply({
-    ephemeral: true,
+      const input = new TextInputBuilder()
+        .setCustomId("captcha_input")
+        .setLabel("画像の文字を入力してください")
+        .setStyle(TextInputStyle.Short);
+
+      const row = new ActionRowBuilder()
+        .addComponents(input);
+
+      modal.addComponents(row);
+
+      await interaction.showModal(modal);
+
+      return;
+    }
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
+    const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
+
+    const captcha = new Captcha(300, 100, answer.length);
+
+    captcha.async = true;
+
+    captcha.drawCaptcha({
+      text: answer,
+    });
+
+    captcha.drawTrace();
+
+    // 一旦 addDecoy は外したまま
+    // captcha.addDecoy({ total: 20 });
+
+    const buffer = await captcha.png;
+    console.log(buffer.length);
+    const attachment = new AttachmentBuilder(buffer, {
+      name: "captcha.png",
+    });
+
+    const answerButton = new ButtonBuilder()
+      .setCustomId("captcha_answer")
+      .setLabel("回答する")
+      .setStyle(ButtonStyle.Primary);
+
+    const answerRow = new ActionRowBuilder().addComponents(answerButton);
+
+    captchas.set(interaction.user.id, answer);
+
+    await interaction.editReply({
+      content: "画像に表示されている文字を入力してください。",
+      files: [attachment],
+      components: [answerRow],
+    });
   });
-
-  const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
-
-  const captcha = new Captcha(300, 100, answer.length);
-
-  captcha.async = true;
-
-  captcha.drawCaptcha({
-    text: answer,
-  });
-
-  captcha.drawTrace();
-
-  // 一旦 addDecoy は外したまま
-  // captcha.addDecoy({ total: 20 });
-
-  const buffer = await captcha.png;
-  console.log(buffer.length);
-  const attachment = new AttachmentBuilder(buffer, {
-    name: "captcha.png",
-  });
-
-  const answerButton = new ButtonBuilder()
-    .setCustomId("captcha_answer")
-    .setLabel("回答する")
-    .setStyle(ButtonStyle.Primary);
-
-  const answerRow = new ActionRowBuilder().addComponents(answerButton);
-
-  captchas.set(interaction.user.id, answer);
-
-  await interaction.editReply({
-    content: "画像に表示されている文字を入力してください。",
-    files: [attachment],
-    components: [answerRow],
-  });
-});
 
 client.login(process.env.TOKEN);
 

@@ -132,11 +132,15 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.customId !== "verify") return;
   const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
+
   client.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
 
     if (interaction.customId !== "verify") return;
 
+    await interaction.deferReply({
+      ephemeral: true,
+    });
     const answer = crypto.randomBytes(3).toString("hex").toUpperCase();
 
     const captcha = new Captcha({
@@ -165,11 +169,10 @@ client.on("interactionCreate", async (interaction) => {
 
     captchas.set(interaction.user.id, answer);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: "画像に表示されている文字を入力してください。",
       files: [attachment],
       components: [answerRow],
-      ephemeral: true,
     });
   });
 
